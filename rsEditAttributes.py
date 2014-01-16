@@ -43,7 +43,7 @@ def cmdCreatorRsEditAtt():
 # @param obj.
 # @return none
 def initializePlugin(mobject):
-    mplugin = OpenMayaMPx.MFnPlugin(mobject, 'Rig Studio - Developer: Roberto Rubio', '1.0', 'Any')
+    mplugin = OpenMayaMPx.MFnPlugin(mobject, 'Rig Studio - Developer: Roberto Rubio', '1.1', 'Any')
     try:
         mplugin.registerCommand(kPluginCmdRsEditAtt, cmdCreatorRsEditAtt)
         mplugin.addMenuItem("rsEdit Attributes", "MayaWindow|mainModifyMenu", "rsEditAttributesUI()", "")
@@ -244,10 +244,18 @@ def editAtUI(i_s_oSels):
     s_addAttLayNames = cmds.frameLayout(label=' AddAtt', labelVisible=False, labelAlign='bottom', borderStyle='etchedIn', height=i_AddEight, width=(2 * i_NameFrame / 5) - 1, parent=s_addsColEnum)
     s_addAttRow = cmds.rowLayout(numberOfColumns=2, parent=s_addAttLayNames)
     cmds.button(label='Del Attribute', command=rsDeleteAttr, align='center', parent=s_addAttRow)
-    cmds.button(label='Add Attribute', command='cmds.AddAttribute()', align='center', parent=s_addAttRow)
+    cmds.button(label='Add Attribute', command=rsAddAttr, align='center', parent=s_addAttRow)
     cmds.showWindow(s_window)
     cmds.window(s_window, edit=True, widthHeight=(i_windowSize), s=False)
     return True
+
+
+##
+# Add Attribute function.
+# @param i_s_button - 3d object.
+# @return boolean.
+def rsAddAttr(i_s_button):
+    cmds.AddAttribute()
 
 
 ##
@@ -266,7 +274,12 @@ def rsDeleteAttr(i_s_button):
         if s_dialog == "No":
             b_delete = False
             print("%s > Has not been deleted" % (l_ChangeAttribute[3]))
-    if b_delete:
+    if b_delete:        
+        l_paramDest = cmds.listConnections(l_ChangeAttribute[3], plugs=True, destination=True, source=True)
+        if l_paramDest:
+            for z in range(len(l_paramDest)):
+                if cmds.getAttr(l_paramDest[z], lock=True):
+                    cmds.setAttr(l_paramDest[z], lock=False)        
         cmds.deleteAttr(l_ChangeAttribute[3])
         print("%s > Has been deleted" % (l_ChangeAttribute[3]))
         cmds.select(cl=True)
@@ -909,8 +922,20 @@ def rsReAtt():
         i_LockState = cmds.getAttr(s_orig, lock=True)
         if i_LockState:
             cmds.setAttr(s_orig, lock=False)
+        l_paramDest = cmds.listConnections(s_orig, plugs=True, destination=True, source=True)
+        l_paramDestLock = []
+        if l_paramDest:
+            for z in range(len(l_paramDest)):
+                l_paramDestLock.append(cmds.getAttr(l_paramDest[z], lock=True))
+                if l_paramDestLock[z]:
+                    cmds.setAttr(l_paramDest[z], lock=False)
         cmds.deleteAttr(l_oSels[0], at=s_Att)
         cmds.undo()
+        if l_paramDest:
+            for z in range(len(l_paramDest)):
+                l_paramDestLock.append(cmds.getAttr(l_paramDest[z], lock=True))
+                if l_paramDestLock[z]:
+                    cmds.setAttr(l_paramDest[z], lock=True)
         if i_LockState:
             cmds.setAttr(s_orig, lock=True)
     cmds.select(cl=True)
