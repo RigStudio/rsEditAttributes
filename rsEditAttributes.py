@@ -43,7 +43,7 @@ def cmdCreatorRsEditAtt():
 # @param obj.
 # @return none
 def initializePlugin(mobject):
-    mplugin = OpenMayaMPx.MFnPlugin(mobject, 'Rig Studio - Developer: Roberto Rubio', '1.1', 'Any')
+    mplugin = OpenMayaMPx.MFnPlugin(mobject, 'Rig Studio - Developer: Roberto Rubio', '1.2', 'Any')
     try:
         mplugin.registerCommand(kPluginCmdRsEditAtt, cmdCreatorRsEditAtt)
         mplugin.addMenuItem("rsEdit Attributes", "MayaWindow|mainModifyMenu", "rsEditAttributesUI()", "")
@@ -620,6 +620,7 @@ def rsChangeCheck(i_b_state, i_s_floatField):
                 f_atValue = (cmds.attributeQuery(l_oSels[1], node=l_oSels[0], maximum=True))[0]
             else:
                 cmds.addAttr(l_oSels[2], edit=True, hasMaxValue=True)
+                cmds.addAttr(l_oSels[2], edit=True, maxValue=f_atValue)
         cmds.floatField(i_s_floatField, edit=True, value=f_atValue, enable=True)
     else:
         cmds.floatField(i_s_floatField, edit=True, value=0, enable=False)
