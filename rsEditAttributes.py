@@ -5,6 +5,7 @@
 
 import maya.OpenMayaMPx as OpenMayaMPx
 import maya.cmds as cmds
+from pymel import versions
 
 kPluginCmdRsEditAtt = "rsEditAttributesUI"
 
@@ -170,8 +171,11 @@ def editAtUI(i_s_oSels):
     s_winColAt = cmds.columnLayout(adjustableColumn=True, parent=s_winRow1)
     s_winLayAtDisplay = cmds.frameLayout(label='Display Attributes', labelAlign='bottom', borderStyle='etchedIn', height=i_ReAtEnumEight, parent=s_winColAt)
     cmds.textScrollList("rsAttributeScroll", allowMultiSelection=False, sc=attSelected, parent=s_winLayAtDisplay)
-    s_winColEn = cmds.columnLayout(adjustableColumn=True, width=i_EnumWidth, parent=s_winRow1)
-    s_winLayAtHidden = cmds.frameLayout(label='Hidden Attributes', labelAlign='bottom', borderStyle='etchedIn', parent=s_winColEn)
+    s_winColEn = cmds.columnLayout(adjustableColumn=True, width=i_EnumWidth, parent=s_winRow1)    
+    if versions.current() >= 201500:
+        s_winLayAtHidden = cmds.frameLayout(label='Hidden Attributes', labelAlign='bottom', borderStyle='etchedIn', height=80, parent=s_winColEn)
+    else:
+        s_winLayAtHidden = cmds.frameLayout(label='Hidden Attributes', labelAlign='bottom', borderStyle='etchedIn', parent=s_winColEn)
     cmds.textScrollList("rsAttributeScrollHidden", numberOfRows=4, allowMultiSelection=False, sc=attSelectedHidden, parent=s_winLayAtHidden)
     s_winLayEn = cmds.frameLayout(label='Enum Strings', labelAlign='bottom', borderStyle='etchedIn', height=i_EnumEight, parent=s_winColEn)
     s_winColEn1 = cmds.columnLayout(adjustableColumn=True, parent=s_winLayEn)
